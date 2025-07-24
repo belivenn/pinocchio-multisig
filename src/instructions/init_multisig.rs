@@ -7,7 +7,7 @@ use pinocchio::{
 };
 use pinocchio_log::log;
 
-use crate::state::{Multisig, MultisigConfig};
+use crate::state::{Multisig, MultisigConfig, Member, Permission};
 
 pub fn process_init_multisig_instruction(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     let [creator, multisig, multisig_config, treasury, _remaining @ ..] = accounts else {
@@ -49,7 +49,7 @@ pub fn process_init_multisig_instruction(accounts: &[AccountInfo], data: &[u8]) 
         let multisig_account = Multisig::from_account_info(&multisig)?;
         multisig_account.creator = *creator.key();
         multisig_account.num_members = unsafe { *(data.as_ptr().add(1) as *const u8) };
-        multisig_account.members = [Pubkey::default(); 10]; 
+        multisig_account.members = [Member::default(); 10];
         multisig_account.treasury = *treasury.key();
         multisig_account.treasury_bump = treasury_bump;
         multisig_account.bump = multisig_bump;
@@ -58,7 +58,11 @@ pub fn process_init_multisig_instruction(accounts: &[AccountInfo], data: &[u8]) 
             0..=10 => {
                 for i in 0..multisig_account.num_members as usize {
                     let member_key = unsafe { *(data.as_ptr().add(2 + i * 32) as *const [u8; 32]) };
-                    multisig_account.members[i] = member_key;
+                    multisig_account.members[i] = Member {
+                        key: member_key,
+                        permissions: Permission::Vote,
+                        is_active: 1,
+                    };
                 }
             }
             _ => return Err(ProgramError::InvalidAccountData),
