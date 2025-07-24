@@ -1,10 +1,10 @@
 use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
-
+use crate::state::Member;
 #[repr(C)]
 pub struct Multisig {
     pub creator: Pubkey,
     pub num_members: u8,
-    pub members: [Pubkey; 10], // Adjust size as needed
+    pub members: [Member; 10], // Adjust size as needed
     pub treasury: Pubkey,      // Treasury account for the multisig
     pub treasury_bump: u8,     // Bump seed for the treasury PDA
     pub bump: u8,              // Bump seed for PDA
@@ -15,7 +15,7 @@ pub struct Multisig {
 }
 
 impl Multisig {
-    pub const LEN: usize = 32 + 1 + 32 * 10 + 1; // 32 bytes for creator, 1 byte for num_members, and 32 bytes for each member
+    pub const LEN: usize = 32 + 1 + 34 * 10 + 1; // 32 bytes for creator, 1 byte for num_members, and (32 + 1+ 1) bytes for each member
 
     pub fn from_account_info_unchecked(account_info: &AccountInfo) -> &mut Self {
         unsafe { &mut *(account_info.borrow_mut_data_unchecked().as_ptr() as *mut Self) }
