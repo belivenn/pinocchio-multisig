@@ -38,30 +38,14 @@ pub fn process_init_multisig_instruction(accounts: &[AccountInfo], data: &[u8]) 
         }
         .invoke()?;
 
-        // Populate Multisig Account
         let multisig_account = Multisig::from_account_info(&multisig)?;
-        multisig_account.admin = None; 
-        multisig_account.admin_spending_limit = None; 
-        multisig_account.creator = *creator.key();
-        multisig_account.treasury = *treasury.key();
-        multisig_account.treasury_bump = treasury_bump;
-        multisig_account.bump = multisig_bump;
-        multisig_account.min_threshold = unsafe { *(data.as_ptr() as *const u8) };
-        multisig_account.max_expiry = unsafe { *(data.as_ptr().add(1) as *const u64) };
-        multisig_account.transaction_index = 0;
-        multisig_account.stale_transaction_index = 0;
-        multisig_account.num_members = unsafe { *(data.as_ptr().add(9) as *const u8) };
-        multisig_account.members = [Pubkey::default(); 10]; 
-
-        match multisig_account.num_members {
-            0..=10 => {
-                for i in 0..multisig_account.num_members as usize {
-                    let member_key = unsafe { *(data.as_ptr().add(10 + i * 32) as *const [u8; 32]) };
-                    multisig_account.members[i] = member_key;
-                }
-            }
-            _ => return Err(ProgramError::InvalidAccountData),
-        }
+        multisig_account.new(
+            creator.key(),
+            treasury.key(),
+            treasury_bump,
+            multisig_bump,
+            data,
+        );
 
     } else {
         return Err(ProgramError::AccountAlreadyInitialized);
