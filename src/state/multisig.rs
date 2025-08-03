@@ -6,11 +6,9 @@ use crate::ID;
 pub struct Multisig {
     pub seed: u64,
     /// Admin account for the multisig optional
-    /// This field is set to None in the init instruction
-    pub admin: Option<Pubkey>, 
+    pub admin: Pubkey, 
     /// Admin spending limit
-    /// This field is set to None in the init instruction
-    pub admin_spending_limit: Option<u64>, 
+    pub admin_spending_limit: u64, 
     pub creator: Pubkey,
     /// Treasury account for the multisig, optional
     pub treasury: Pubkey,      
@@ -32,18 +30,7 @@ pub struct Multisig {
 
 
 impl Multisig {
-    pub const LEN: usize = size_of::<u64>() 
-    + size_of::<Option<Pubkey>>()
-    + size_of::<Option<u64>>()
-    + size_of::<Pubkey>()
-    + size_of::<Pubkey>()
-    + size_of::<u8>()
-    + size_of::<u8>() 
-    + size_of::<u64>()
-    + size_of::<u64>() 
-    + size_of::<u64>()
-    + size_of::<u8>()
-    + size_of::<u8>();
+    pub const LEN: usize = size_of::<Self>();
 
     /// Populate the multisig account with initialization data
     pub fn new(
@@ -54,8 +41,8 @@ impl Multisig {
         multisig_bump: u8,
         data: &[u8],
     ) {
-        self.admin = None;
-        self.admin_spending_limit = None;
+        self.admin = Pubkey::default();
+        self.admin_spending_limit = 0;
         self.creator = *creator;
         self.treasury = *treasury;
         self.treasury_bump = treasury_bump;

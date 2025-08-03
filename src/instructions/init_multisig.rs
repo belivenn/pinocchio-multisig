@@ -18,7 +18,7 @@ pub fn process_init_multisig_instruction(accounts: &[AccountInfo], data: &[u8]) 
     let seeds = &seed[..];
     let (pda_multisig, multisig_bump) = pubkey::find_program_address(seeds, &crate::ID);
     assert_eq!(&pda_multisig, multisig.key());
-
+        
     // Treasury PDA
     let treasury_seed = [(b"treasury"), multisig.key().as_slice()];
     let treasury_seeds = &treasury_seed[..];

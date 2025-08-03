@@ -11,9 +11,8 @@ pub struct Member {
 }
 
 impl Member {
-    pub const LEN: usize = size_of::<Pubkey>() 
-    + size_of::<u8>()
-    + size_of::<u8>();
+    pub const LEN: usize = size_of::<Self>();
+
 
     #[inline]
     pub fn from_account_info_unchecked(account_info: &AccountInfo) -> &mut Self {
