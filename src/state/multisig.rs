@@ -1,4 +1,5 @@
 use pinocchio::{account_info::{AccountInfo, Ref}, program_error::ProgramError, pubkey::Pubkey};
+use core::mem::size_of;
 
 use crate::ID;
 
